@@ -1,17 +1,26 @@
 package main;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
 
 public class HeapQueue<T extends Comparable> implements PriorityQueue<T> {
 
     /* Data Members */
     private int size;
+    private int maxCapacity;
     private Comparable[] heap; // I guess we have to use an array of comparable here, huh?
 
 
     public HeapQueue(Collection<T> objects) {
+        if (objects == null) throw new IllegalArgumentException("Supplied collection was null!");
         // Initialize our queue with these objects
-        this(objects.size());
+        int capacity = objects.size();
+        if (capacity <= 0) throw new IllegalArgumentException("Collection size must be greater than zero!");
+        this.maxCapacity = capacity;
+        this.size = 0;
+
+        this.heap = new Comparable[maxCapacity];
 
         for (T object : objects) {
             this.add(object);
@@ -19,7 +28,9 @@ public class HeapQueue<T extends Comparable> implements PriorityQueue<T> {
     }
 
     public HeapQueue(int maxCapacity) {
-        this.size = maxCapacity;
+        if (maxCapacity <= 0) throw new IllegalArgumentException("Capacity must be greater than zero!");
+        this.maxCapacity = maxCapacity;
+        this.size = 0;
 
         this.heap = new Comparable[maxCapacity];
     }
@@ -27,8 +38,12 @@ public class HeapQueue<T extends Comparable> implements PriorityQueue<T> {
 
     @Override
     public void add(T obj) {
-        heap[size] = obj;
+        if (size == maxCapacity) throw new IllegalStateException("Queue has reached max capacity!");
+        if (obj == null) throw new IllegalArgumentException("Object to add was null!");
 
+        // Put our dude in at the end
+        heap[size] = obj;
+        // Only to quickly bubble him up to the right place :)
         bubbleUp(size);
 
         size++;
@@ -36,11 +51,13 @@ public class HeapQueue<T extends Comparable> implements PriorityQueue<T> {
 
     @Override
     public T peek() {
+        if (size == 0) return null;
         return (T) heap[0];
     }
 
     @Override
     public T poll() {
+        if (size == 0) return null;
         Comparable head = heap[0];
 
         if (size > 1) {
@@ -59,6 +76,69 @@ public class HeapQueue<T extends Comparable> implements PriorityQueue<T> {
     public int size() {
         return this.size;
     }
+
+
+
+
+    // The big three
+
+
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+
+        str.append("Elements: {");
+
+        for (int i = 0; i < size; i++) {
+            str.append(heap[i].toString());
+
+            if (i < size - 1) {
+                str.append(", ");
+            }
+        }
+
+        str.append("}");
+
+        return str.toString();
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof HeapQueue)) return false;
+        HeapQueue<?> heapQueue = (HeapQueue<?>) o;
+
+        // Check the easy stuff first
+        if (!(size == heapQueue.size && maxCapacity == heapQueue.maxCapacity)) {
+            return false;
+        }
+
+        // Check all of our children
+        for (int i = 0; i < size; i++) {
+            if (!(heap[i].equals(heapQueue.heap[i]))) {
+                return false;
+            }
+        }
+        // Whatever remains, however unlikely, must be the truth
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int fullHash = Objects.hash(size, maxCapacity);;
+
+        if (size > 0) {
+            fullHash *= heap[0].hashCode();         // First element
+            fullHash *= heap[size - 1].hashCode();  // Last element
+        }
+
+        fullHash *= 41;                             // Prime numberino
+
+        return fullHash;
+    }
+
+
 
 
     /* Helper Methods */
@@ -104,7 +184,13 @@ public class HeapQueue<T extends Comparable> implements PriorityQueue<T> {
         int leftChildIndex = getLeftChild(index);
         int rightChildIndex = getRightChild(index);
 
-        if (leftChildIndex >= size || rightChildIndex >= size) return -1;
+        if (rightChildIndex >= size) {      // Right child is unswappable
+            if (leftChildIndex >= size) {   // Left child is also unswappable (nonexistent)
+                return -1;                  // This dude is a leaf node
+            } else {
+                return leftChildIndex;      // Hey, we actually do have a left child!
+            }
+        }
 
         Comparable leftChild = heap[leftChildIndex];
         Comparable rightChild = heap[rightChildIndex];
