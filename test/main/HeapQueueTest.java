@@ -341,10 +341,10 @@ class HeapQueueTest {
         assertTrue(heapQueue.size() == 1);
         assertTrue(heapQueue.peek() == 100);
 
-        assertThrows(RuntimeException.class, () -> heapQueue.add(1));
+        heapQueue.add(1);
 
-        assertTrue(heapQueue.size() == 1);
-        assertTrue(heapQueue.peek() == 100);
+        assertTrue(heapQueue.size() == 2);
+        assertTrue(heapQueue.peek() == 1);
     }
 
     @Test
@@ -366,22 +366,18 @@ class HeapQueueTest {
         int queueCapacity = 5;
         heapQueue = new HeapQueue<>(queueCapacity);
 
-        List<Integer> numbersToAdd = Arrays.asList(7, 2, 4, 1, 5, 10, 10, 10);
+        List<Integer> numbersToAdd = Arrays.asList(7, 2, 4, 1, 5, 10, 1, 13);
 
         List<Integer> expectedPeeks = Arrays.asList(7, 2, 2, 1, 1, 1, 1, 1);
-        List<Integer> expectedBeforeSizes = Arrays.asList(0, 1, 2, 3, 4, 5, 5, 5);
-        List<Integer> expectedAfterSizes = Arrays.asList(1, 2, 3, 4, 5, 5, 5, 5);
+        List<Integer> expectedBeforeSizes = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7);
+        List<Integer> expectedAfterSizes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8);
 
 
         for (int i = 0; i < numbersToAdd.size(); i++) {
             assertTrue(heapQueue.size() == expectedBeforeSizes.get(i));
 
-            if (i < queueCapacity) {
-                heapQueue.add(numbersToAdd.get(i));
-                assertEquals(expectedPeeks.get(i), heapQueue.peek());
-            } else {
-                assertThrows(RuntimeException.class, () -> heapQueue.add(10));
-            }
+            heapQueue.add(numbersToAdd.get(i));
+            assertEquals(expectedPeeks.get(i), heapQueue.peek());
 
             assertTrue(heapQueue.size() == expectedAfterSizes.get(i));
         }
@@ -434,7 +430,7 @@ class HeapQueueTest {
     }
 
     @Test
-    @DisplayName("Test size after failed addition")
+    @DisplayName("Test size after over capacity addition")
     public void testSizeAfterFailedAddition() {
         heapQueue = new HeapQueue<>(3);
         heapQueue.add(1);
@@ -442,8 +438,8 @@ class HeapQueueTest {
         heapQueue.add(41);
 
         assertTrue(heapQueue.size() == 3);
-        assertThrows(RuntimeException.class, () -> heapQueue.add(6));
-        assertTrue(heapQueue.size() == 3);
+        heapQueue.add(6);
+        assertTrue(heapQueue.size() == 4);
     }
 
     @Test

@@ -1,5 +1,6 @@
 package main;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -38,8 +39,11 @@ public class HeapQueue<T extends Comparable> implements PriorityQueue<T> {
 
     @Override
     public void add(T obj) {
-        if (size == maxCapacity) throw new IllegalStateException("Queue has reached max capacity!");
         if (obj == null) throw new IllegalArgumentException("Object to add was null!");
+        if (size == maxCapacity) {
+            // We should double our size!
+            heap = Arrays.copyOf(heap, maxCapacity * 2);
+        }
 
         // Put our dude in at the end
         heap[size] = obj;
