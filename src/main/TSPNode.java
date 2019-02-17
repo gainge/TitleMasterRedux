@@ -9,13 +9,16 @@ public class TSPNode implements Comparable<TSPNode> {
     /* CONSTANTS */
     private static double INFINITY = Double.MAX_VALUE;
 
-
-
     /* Static Members */
     // I don't think that we should have any static members
     //      Really the only one that makes sense is the number of cities
     //      But even that can be derived from our matrix, so it's w/e
 
+    /* Data Members */
+    private double[][] matrix;
+    private double lowerBound;
+    private List<Integer> partialPath;
+    private int currentCity;
 
     /* Constructors */
     public TSPNode(double[][] matrix) {
@@ -34,19 +37,6 @@ public class TSPNode implements Comparable<TSPNode> {
         this.partialPath = partialPath;
     }
 
-
-
-    /* Data Members */
-    private double[][] matrix;
-    private double lowerBound;
-    private List<Integer> partialPath;
-    private int currentCity;
-
-    // Maybe should have a static function that, given a matrix and a starting node, can produce a node instance with all the right data
-    //      Like, the right matrix (reduced), plus the right partial path?
-
-
-
     public static double[][] createDistanceMatrix(List<DistanceComparable> cities) {
         double[][] distanceMatrix = new double[cities.size()][cities.size()];
 
@@ -56,7 +46,7 @@ public class TSPNode implements Comparable<TSPNode> {
                     distanceMatrix[row][col] = INFINITY;
                 } else {
                     distanceMatrix[row][col] = cities.get(row).getDistance(cities.get(col));
-                    // Make the distance reflexive
+                    // Make the distance reflexive, we're bidirectional here, baby
                     distanceMatrix[col][row] = distanceMatrix[row][col];
                 }
             }
@@ -123,26 +113,44 @@ public class TSPNode implements Comparable<TSPNode> {
     }
 
 
+    public List<Integer> getPossibleChildren() {
+        // Actually, shouldn't this just loop through the indices of the matrix to build the child list?
+        List<Integer> children = new ArrayList<>();
 
+        // Count up them children
+        // Base case is that this is a near complete path, we can go back to the start
+        if (partialPath.size() == matrix.length) {
+            if (cityIsAccessible(partialPath.get(0))) {
+                children.add(partialPath.get(0));
+            }
+        }
+        else {
+            // We need to count manually
+            for (int i = 0; i < matrix.length; i++) {
+                if (i == currentCity) continue;             // Can't link to ourselves
+                if (partialPath.contains(i)) continue;      // Can't go back to where we've already gone
+                if (!cityIsAccessible(i)) continue;         // Can't go to an infinity spot
 
+                children.add(i);
+            }
+        }
 
+        return children;
+    }
 
+    public boolean cityIsAccessible(int cityNum) {
+        return (this.matrix[currentCity][cityNum] != INFINITY);
+    }
 
-
-
-
+    public boolean hasCompletePath() {
+        return (partialPath.size() == matrix.length + 1);
+    }
 
 
     @Override
     public int compareTo(TSPNode o) {
         return Double.compare(this.lowerBound, o.lowerBound);   // We're compared by our lower bounds!
     }
-
-
-
-
-
-
 
 
     /* Accessor Methods */
