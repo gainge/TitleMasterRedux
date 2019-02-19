@@ -10,9 +10,6 @@ public class TSPNode implements Comparable<TSPNode> {
     private static double INFINITY = Double.MAX_VALUE;
 
     /* Static Members */
-    // I don't think that we should have any static members
-    //      Really the only one that makes sense is the number of cities
-    //      But even that can be derived from our matrix, so it's w/e
 
     /* Data Members */
     private double[][] matrix;
@@ -149,7 +146,12 @@ public class TSPNode implements Comparable<TSPNode> {
 
     @Override
     public int compareTo(TSPNode o) {
-        return Double.compare(this.lowerBound, o.lowerBound);   // We're compared by our lower bounds!
+        return Double.compare(this.getValue(), o.getValue());   // We're compared by our lower bounds!
+    }
+
+    public double getValue() {
+        return lowerBound / Math.log(partialPath.size() + 2) / Math.log(3);
+//        return lowerBound * (1 - (partialPath.size() / matrix.length));
     }
 
 
@@ -165,7 +167,7 @@ public class TSPNode implements Comparable<TSPNode> {
 
     // TODO: Update the lowerbound and figure out what to do here, lol
     public double getLowerBound() {
-        return INFINITY;
+        return this.lowerBound;
     }
 
     public void setLowerBound(double lowerBound) {
