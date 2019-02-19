@@ -42,7 +42,8 @@ public class HeapQueue<T extends Comparable> implements PriorityQueue<T> {
         if (obj == null) throw new IllegalArgumentException("Object to add was null!");
         if (size == maxCapacity) {
             // We should double our size!
-            heap = Arrays.copyOf(heap, maxCapacity * 2);
+            maxCapacity *= 2;
+            heap = Arrays.copyOf(heap, maxCapacity);
         }
 
         // Put our dude in at the end
