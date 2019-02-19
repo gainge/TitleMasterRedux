@@ -5,7 +5,6 @@ import java.util.List;
 
 public class BBSolver {
 
-
     public static int TIME_LIMIT = 20;
 
     /* Data Members */
@@ -30,7 +29,9 @@ public class BBSolver {
         TSPNode genericRoot = new TSPNode(initialMatrix);
         genericRoot.reduceMatrix();
 
-        performBB(genericRoot, getTime(), cities.size());
+        findGreedySolution(initialMatrix, 0);
+
+        performBB(genericRoot, Util.getTime(), cities.size());
 
         return buildOptimalPath(cities); // We'll return the ordered list of TSPNodes built from checking our bssf's partial path
     }
@@ -38,6 +39,54 @@ public class BBSolver {
 
 
     /* Helper Functions */
+    private void findGreedySolution(double[][] adjacency, int startingCity) {
+        TSPNode greedySolution = new TSPNode(adjacency);
+
+        int currentCity = startingCity;
+        double greedyCost = 0;
+
+        List<Integer> path = new ArrayList<>();
+        path.add(startingCity);
+
+        List<Integer> remainingCities = new ArrayList<>();
+        for (int i = 0; i < adjacency.length; i++) {
+            if (i == startingCity) continue;
+            remainingCities.add(i);
+        }
+
+        while (true) {
+            double minCost = Double.MAX_VALUE;
+            int minCity = -1;
+
+            for (Integer currentDestination : remainingCities) {
+                if (path.contains(currentDestination)) continue;    // Move on
+                if (currentDestination == currentCity) continue;    // no me gusta
+
+                // Check to see if it's the min
+                if (adjacency[currentCity][currentDestination] < minCost) {
+                    minCost = adjacency[currentCity][currentDestination];
+                    minCity = currentDestination;
+                }
+
+            }
+
+            // Log this edge as being travelled
+            greedyCost += minCost;
+            path.add(minCity);
+            currentCity = minCity;
+
+            if (path.size() >= adjacency.length) break;
+        }
+
+        path.add(path.get(0));  // idk if this is how I did it or not
+
+        greedySolution.setLowerBound(greedyCost);
+        bssf = greedySolution;
+        bssfLowerBound = greedyCost;
+    }
+
+
+
     private List<DistanceComparable> buildOptimalPath(List<DistanceComparable> cities) {
         List<DistanceComparable> optimalPath = new ArrayList<>();
 
@@ -47,6 +96,8 @@ public class BBSolver {
 
         return optimalPath;
     }
+
+
 
     private void performBB(TSPNode genericRoot, double startTime, int numCities) {
         for (int startCityIndex = 0; startCityIndex < numCities; startCityIndex++) {
@@ -66,7 +117,7 @@ public class BBSolver {
                 TSPNode currentNode = priorityQueue.poll();
                 if (currentNode == null) break;
 
-                if (getTime() - startTime>= TIME_LIMIT) {
+                if (Util.getTime() - startTime >= TIME_LIMIT) {
                     return;     // Time is up!
                 }
 
@@ -91,13 +142,10 @@ public class BBSolver {
                     }
                 } // End child loop
             } // End queue loop
+
+            break;
         } // End random starting city loop
     }
 
-
-    /* Helper Methods */
-    private double getTime() {
-        return System.currentTimeMillis() / 1000.0;
-    }
 
 }
