@@ -17,7 +17,7 @@ public class Main {
 
         double startTime = Util.getTime();
 
-        List<DistanceComparable> optimalPath = solver.solve(cities);
+        List<DistanceComparable> optimalPath = solver.solveForPath(cities, 0);
 
         double endTime = Util.getTime();
 

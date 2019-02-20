@@ -21,6 +21,27 @@ public class BBSolver {
 
     /* Member Functions */
     public List<DistanceComparable> solve(List<DistanceComparable> cities) {
+        // Start from all cities, classic TSP style
+        List<Integer> startingCities = new ArrayList<>();
+
+        for (int i = 0; i < cities.size(); i++) {
+            startingCities.add(i);
+        }
+
+        return solve(cities, startingCities);
+    }
+
+
+    public List<DistanceComparable> solveForPath(List<DistanceComparable> cities, int dummyCityIndex) {
+        // Only start from the dummy city, otherwise the bounding function won't create children properly
+        List<Integer> startingCities = new ArrayList<>();
+        startingCities.add(dummyCityIndex);
+
+        return solve(cities, startingCities);
+    }
+
+
+    private List<DistanceComparable> solve(List<DistanceComparable> cities, List<Integer> startingCities) {
         this.priorityQueue = new HeapQueue<>(cities.size());    // Start w/ size at the number of cities
 
         // Create the initial distance matrix
@@ -31,11 +52,10 @@ public class BBSolver {
 
         findGreedySolution(initialMatrix, 0);
 
-        performBB(genericRoot, Util.getTime(), cities.size());
+        performBB(genericRoot, Util.getTime(), startingCities);
 
         return buildOptimalPath(cities); // We'll return the ordered list of TSPNodes built from checking our bssf's partial path
     }
-
 
 
     /* Helper Functions */
@@ -85,8 +105,6 @@ public class BBSolver {
         bssfLowerBound = greedyCost;
     }
 
-
-
     private List<DistanceComparable> buildOptimalPath(List<DistanceComparable> cities) {
         List<DistanceComparable> optimalPath = new ArrayList<>();
 
@@ -97,10 +115,8 @@ public class BBSolver {
         return optimalPath;
     }
 
-
-
-    private void performBB(TSPNode genericRoot, double startTime, int numCities) {
-        for (int startCityIndex = 0; startCityIndex < numCities; startCityIndex++) {
+    private void performBB(TSPNode genericRoot, double startTime, List<Integer> startingCities) {
+        for (Integer startCityIndex : startingCities) {
             // Create a new partial path for this dude, a new generic root starting who knows where
             List<Integer> partialPath = new ArrayList<>();
             partialPath.add(startCityIndex);
@@ -142,8 +158,6 @@ public class BBSolver {
                     }
                 } // End child loop
             } // End queue loop
-
-            break;
         } // End random starting city loop
     }
 
