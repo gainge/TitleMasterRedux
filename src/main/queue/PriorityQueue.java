@@ -1,4 +1,4 @@
-package main;
+package main.queue;
 
 import java.util.Collection;
 

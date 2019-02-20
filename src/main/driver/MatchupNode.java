@@ -1,4 +1,6 @@
-package main;
+package main.driver;
+
+import main.tsp.DistanceComparable;
 
 import java.util.Objects;
 

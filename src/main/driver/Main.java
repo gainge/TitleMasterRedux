@@ -1,4 +1,8 @@
-package main;
+package main.driver;
+
+import main.util.Util;
+import main.tsp.BBSolver;
+import main.tsp.DistanceComparable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,7 +14,7 @@ public class Main {
 
 
     public void run(String[] args) {
-        List<DistanceComparable> cities = buildNodeList("src/test.txt");
+        List<DistanceComparable> cities = buildNodeList("res/test.txt");
 
         BBSolver solver = new BBSolver();
         BBSolver.TIME_LIMIT = 20;

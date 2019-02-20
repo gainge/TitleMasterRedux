@@ -1,4 +1,8 @@
-package main;
+package main.tsp;
+
+import main.util.Util;
+import main.queue.HeapQueue;
+import main.queue.PriorityQueue;
 
 import java.util.ArrayList;
 import java.util.List;

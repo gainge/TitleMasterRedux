@@ -1,8 +1,7 @@
-package main;
+package main.queue;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 
 public class HeapQueue<T extends Comparable> implements PriorityQueue<T> {
@@ -10,7 +9,7 @@ public class HeapQueue<T extends Comparable> implements PriorityQueue<T> {
     /* Data Members */
     private int size;
     private int maxCapacity;
-    private Comparable[] heap; // I guess we have to use an array of comparable here, huh?
+    private Comparable[] heap;
 
 
     public HeapQueue(Collection<T> objects) {
@@ -83,11 +82,7 @@ public class HeapQueue<T extends Comparable> implements PriorityQueue<T> {
     }
 
 
-
-
     // The big three
-
-
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
